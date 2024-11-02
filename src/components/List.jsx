@@ -1,16 +1,13 @@
-
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Typography, Card, CardContent, Button, TextField } from "@mui/material";
+import MyCard from "./Card";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const apiKey = import.meta.env.VITE_API_KEY;
 const apiToken = import.meta.env.VITE_API_TOKEN;
-import {
-  Typography,
-  Card,
-  CardContent,
-  Button,
-  TextField,
-} from "@mui/material";
-import MyCard from "./Card";
+const api = import.meta.env.VITE_API;
 
 const List = ({ list, onDeleteList }) => {
   const [cards, setCards] = useState([]);
@@ -23,24 +20,29 @@ const List = ({ list, onDeleteList }) => {
   const fetchCards = async () => {
     try {
       const response = await axios.get(
-        `https://api.trello.com/1/lists/${list.id}/cards?key=${apiKey}&token=${apiToken}`
+        `${api}/lists/${list.id}/cards?key=${apiKey}&token=${apiToken}`
       );
       setCards(response.data);
     } catch (error) {
-      console.error("Error fetching cards:", error);
+      toast.error("Error fetching cards. Please try again.");
     }
   };
 
   const createCard = async () => {
+    if (!newCardText) {
+      toast.warn("Card name cannot be empty.");
+      return;
+    }
     try {
       const response = await axios.post(
-        `https://api.trello.com/1/cards?key=${apiKey}&token=${apiToken}`,
+        `${api}/cards?key=${apiKey}&token=${apiToken}`,
         { name: newCardText, idList: list.id }
       );
       setCards((prevState) => [...prevState, response.data]);
       setNewCardText("");
+      toast.success("Card created successfully!");
     } catch (error) {
-      console.error("Error creating card:", error);
+      toast.error("Error creating card. Please try again.");
     }
   };
 
@@ -48,19 +50,21 @@ const List = ({ list, onDeleteList }) => {
     event.stopPropagation();
     try {
       await axios.delete(
-        `https://api.trello.com/1/cards/${cardId}?key=${apiKey}&token=${apiToken}`
+        `${api}/cards/${cardId}?key=${apiKey}&token=${apiToken}`
       );
       setCards(cards.filter((card) => card.id !== cardId));
+      toast.success("Card deleted successfully!");
     } catch (error) {
-      console.error("Error deleting card:", error);
+      toast.error("Error deleting card. Please try again.");
     }
   };
 
   return (
     <div>
+      <ToastContainer />
       <Card
         key={list.id}
-        sx={{ minWidth: 275, margin: "0 8px", backgroundColor: "lavender  " }}
+        sx={{ minWidth: 275, margin: "0 8px", backgroundColor: "lavender" }}
       >
         <CardContent>
           <Typography variant="h5" component="div">
@@ -78,7 +82,10 @@ const List = ({ list, onDeleteList }) => {
           {cards.map((card) => (
             <MyCard key={card.id} card={card} onDeleteCard={deleteCard} />
           ))}
-          <form>
+          <form onSubmit={(e) => {
+            e.preventDefault(); 
+            createCard();
+          }}>
             <TextField
               label="New Card"
               value={newCardText}
@@ -88,7 +95,7 @@ const List = ({ list, onDeleteList }) => {
               variant="outlined"
               margin="dense"
             />
-            <Button onClick={createCard} variant="contained" size="small">
+            <Button type="submit" variant="contained" size="small">
               Add Card
             </Button>
           </form>

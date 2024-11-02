@@ -9,9 +9,12 @@ import {
   Grid,
   Paper,
 } from "@mui/material";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const apiKey = import.meta.env.VITE_API_KEY;
 const apiToken = import.meta.env.VITE_API_TOKEN;
+const api = import.meta.env.VITE_API;
 
 function Board() {
   const { boardId } = useParams();
@@ -26,46 +29,47 @@ function Board() {
   const fetchLists = async () => {
     try {
       const response = await axios.get(
-        `https://api.trello.com/1/boards/${boardId}?lists=open&list_fields=name&key=${apiKey}&token=${apiToken}`
+        `${api}/boards/${boardId}?lists=open&list_fields=name&key=${apiKey}&token=${apiToken}`
       );
       setBoardName(response.data.name);
       setLists(response.data.lists);
     } catch (error) {
-      console.error("Error fetching board:", error);
+      toast.error("Error fetching board. Please try again.");
     }
   };
 
   const createList = async () => {
+    if (!newListName) {
+      toast.warn("List name cannot be empty.");
+      return;
+    }
     try {
       const response = await axios.post(
-        `https://api.trello.com/1/lists?key=${apiKey}&token=${apiToken}`,
+        `${api}/lists?key=${apiKey}&token=${apiToken}`,
         { name: newListName, idBoard: boardId }
       );
       setLists((prevState) => [...prevState, response.data]);
       setNewListName("");
+      toast.success("List created successfully!");
     } catch (error) {
-      console.error("Error creating list:", error);
+      toast.error("Error creating list. Please try again.");
     }
   };
 
   const deleteList = async (listId) => {
     try {
-      let archiveUrl = `https://api.trello.com/1/lists/${listId}/closed?value=true&key=${apiKey}&token=${apiToken}`;
-      await axios({
-        method: "put",
-        url: archiveUrl,
-        data: {
-          closed: true,
-        },
-      });
-      setLists(lists.filter((list) => listId !== list.id));
+      const archiveUrl = `${api}/lists/${listId}/closed?value=true&key=${apiKey}&token=${apiToken}`;
+      await axios.put(archiveUrl, { closed: true });
+      setLists((prevLists) => prevLists.filter((list) => listId !== list.id));
+      toast.success("List deleted successfully!");
     } catch (error) {
-      console.error("Error deleting list:", error);
+      toast.error("Error deleting list. Please try again.");
     }
   };
 
   return (
     <div style={{ marginLeft: "30px" }}>
+      <ToastContainer />
       <Typography variant="h4" gutterBottom>
         {boardName}
       </Typography>

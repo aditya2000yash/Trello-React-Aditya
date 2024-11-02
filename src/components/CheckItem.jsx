@@ -1,4 +1,3 @@
-
 import { Box, Checkbox, IconButton, Typography } from "@mui/material";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import toast from "react-hot-toast";
@@ -6,19 +5,24 @@ import axios from "axios";
 
 const apiKey = import.meta.env.VITE_API_KEY;
 const apiToken = import.meta.env.VITE_API_TOKEN;
+const api = import.meta.env.VITE_API;
 
 const CheckItem = ({ checkItem, onDeleteCheckItem, updateProgress, checkItems, setCheckItems }) => {
   const handleDelete = async () => {
-    await onDeleteCheckItem(checkItem.id);
+    try {
+      await onDeleteCheckItem(checkItem.id);
+      toast.success("Check item deleted successfully.");
+    } catch (error) {
+      toast.error("Error deleting check item.");
+    }
   };
 
   const handleToggleComplete = async (event) => {
-    console.log("checked: " , event.target.checked);
     const updatedState = event.target.checked ? "complete" : "incomplete";
     
     try {
       await axios.get(
-        `https://api.trello.com/1/checklists/${checkItem.idChecklist}/checkItems/${checkItem.id}?state=${updatedState}&key=${apiKey}&token=${apiToken}`
+        `${api}/checklists/${checkItem.idChecklist}/checkItems/${checkItem.id}?state=${updatedState}&key=${apiKey}&token=${apiToken}`
       );
 
       const updatedCheckItems = checkItems.map(item =>
@@ -60,8 +64,3 @@ const CheckItem = ({ checkItem, onDeleteCheckItem, updateProgress, checkItems, s
 };
 
 export default CheckItem;
-
-
-
-//----------------
-

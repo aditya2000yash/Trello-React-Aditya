@@ -10,9 +10,12 @@ import {
   TextField,
   Popover,
 } from "@mui/material";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const apiKey = import.meta.env.VITE_API_KEY;
 const apiToken = import.meta.env.VITE_API_TOKEN;
+const api = import.meta.env.VITE_API;
 
 function Home() {
   const [boards, setBoards] = useState([]);
@@ -26,25 +29,30 @@ function Home() {
   const fetchBoards = async () => {
     try {
       const response = await axios.get(
-        `https://api.trello.com/1/members/me/boards?key=${apiKey}&token=${apiToken}`
+        `${api}/members/me/boards?key=${apiKey}&token=${apiToken}`
       );
       setBoards(response.data);
     } catch (error) {
-      console.error("Error fetching boards:", error);
+      toast.error("Error fetching boards. Please try again.");
     }
   };
 
   const createBoard = async () => {
+    if (!newBoardName) {
+      toast.warn("Board name cannot be empty.");
+      return;
+    }
     try {
       const response = await axios.post(
-        `https://api.trello.com/1/boards?key=${apiKey}&token=${apiToken}`,
+        `${api}/boards?key=${apiKey}&token=${apiToken}`,
         { name: newBoardName }
       );
-      setBoards(prevState => [...prevState, response.data]);
+      setBoards((prevBoards) => [...prevBoards, response.data]);
       setNewBoardName("");
-      setAnchorEl(null); 
+      handlePopoverClose();
+      toast.success("Board created successfully!");
     } catch (error) {
-      console.error("Error creating board:", error);
+      toast.error("Error creating board. Please try again.");
     }
   };
 
@@ -59,19 +67,16 @@ function Home() {
   const open = Boolean(anchorEl);
 
   return (
-    <div 
+    <div
       style={{
         margin: "0",
-        marginTop: '-30px',  
+        marginTop: "-30px",
         padding: "20px",
         position: "relative",
         height: "calc(100vh - 60px)",
-        backgroundImage: 'url("src/assets/background.png")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
       }}
     >
+      <ToastContainer />
       <Typography variant="h4" gutterBottom>
         Boards
       </Typography>
@@ -90,9 +95,16 @@ function Home() {
           </Grid>
         ))}
         <Grid item xs={12} sm={6} md={4} lg={3}>
-          <Card sx={{ marginBottom: "8px" , width: "180px", bgcolor: 'transparent', boxShadow: '0 0 0 rgb(0, 0, 0)'}}>
+          <Card
+            sx={{
+              marginBottom: "8px",
+              width: "180px",
+              bgcolor: "transparent",
+              boxShadow: "none",
+            }}
+          >
             <CardContent>
-              <Button variant="contained"  onClick={handlePopoverOpen} >
+              <Button variant="contained" onClick={handlePopoverOpen}>
                 Create Board
               </Button>
               <Popover
@@ -100,12 +112,12 @@ function Home() {
                 anchorEl={anchorEl}
                 onClose={handlePopoverClose}
                 anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'center',
+                  vertical: "bottom",
+                  horizontal: "center",
                 }}
                 transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'center',
+                  vertical: "top",
+                  horizontal: "center",
                 }}
               >
                 <CardContent>

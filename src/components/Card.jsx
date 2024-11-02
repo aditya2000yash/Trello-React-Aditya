@@ -10,10 +10,11 @@ import {
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Checklist from "./Checklist";
-
+import toast from "react-hot-toast"; 
 
 const apiKey = import.meta.env.VITE_API_KEY;
 const apiToken = import.meta.env.VITE_API_TOKEN;
+const api = import.meta.env.VITE_API;
 
 const style = {
   position: "absolute",
@@ -25,12 +26,15 @@ const style = {
   border: "2px solid #000",
   boxShadow: 24,
   p: 4,
+  maxHeight: '80vh', 
+  overflowY: 'auto', 
 };
 
 const MyCard = ({ card, onDeleteCard }) => {
   const [checklists, setCheckLists] = useState([]);
   const [open, setOpen] = useState(false);
   const [newChecklistName, setNewChecklistName] = useState("");
+
   const handleClose = () => {
     setOpen(!open);
   };
@@ -42,41 +46,40 @@ const MyCard = ({ card, onDeleteCard }) => {
   const fetchChecklists = async () => {
     try {
       const response = await axios.get(
-        `https://api.trello.com/1/cards/${card.id}/checklists?key=${apiKey}&token=${apiToken}`
+        `${api}/cards/${card.id}/checklists?key=${apiKey}&token=${apiToken}`
       );
       setCheckLists(response.data);
     } catch (error) {
-      console.error("Error fetching checklists:", error);
+      toast.error("Error fetching checklists.");
     }
   };
+
   const deleteChecklist = async (checklistId) => {
     try {
       await axios.delete(
-        `https://api.trello.com/1/checklists/${checklistId}?key=${apiKey}&token=${apiToken}`
+        `${api}/checklists/${checklistId}?key=${apiKey}&token=${apiToken}`
       );
-      setCheckLists(
-        checklists.filter((checklist) => checklist.id != checklistId)
-      );
+      setCheckLists(checklists.filter((checklist) => checklist.id !== checklistId));
+      toast.success("Checklist deleted successfully.");
     } catch (error) {
-      console.error("Error deleting checklist:", error);
+      toast.error("Error deleting checklist.");
     }
   };
 
   const createChecklist = async () => {
     try {
       const response = await axios.post(
-        `https://api.trello.com/1/checklists?key=${apiKey}&token=${apiToken}`,
+        `${api}/checklists?key=${apiKey}&token=${apiToken}`,
         {
           idCard: card.id,
           name: newChecklistName,
         }
       );
-      const newChecklist = response.data;
-      setCheckLists(prevState => [...prevState, response.data])
+      setCheckLists((prevState) => [...prevState, response.data]);
       setNewChecklistName("");
+      toast.success("Checklist created successfully.");
     } catch (error) {
-      console.error("Error creating checklist:", error);
-      return null;
+      toast.error("Error creating checklist.");
     }
   };
 
@@ -104,9 +107,9 @@ const MyCard = ({ card, onDeleteCard }) => {
                 checklist={checklist}
                 onDeleteChecklist={deleteChecklist}
               />
-            </div>
+            </div>// Import toast for notifications
           ))}
-          <form>
+          <form onSubmit={(e) => { e.preventDefault(); createChecklist(); }}>
             <TextField
               label="New Checklist"
               value={newChecklistName}
@@ -116,7 +119,7 @@ const MyCard = ({ card, onDeleteCard }) => {
               variant="outlined"
               margin="dense"
             />
-            <Button onClick={createChecklist} variant="contained" size="small">
+            <Button type="submit" variant="contained" size="small">
               Add Checklist
             </Button>
           </form>

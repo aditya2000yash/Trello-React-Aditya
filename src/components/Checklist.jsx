@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 
 const apiKey = import.meta.env.VITE_API_KEY;
 const apiToken = import.meta.env.VITE_API_TOKEN;
+const api = import.meta.env.VITE_API;
 
 const Checklist = ({ checklist, onDeleteChecklist }) => {
   const [checkItems, setCheckItems] = useState([]);
@@ -19,12 +20,11 @@ const Checklist = ({ checklist, onDeleteChecklist }) => {
   const fetchCheckItems = async () => {
     try {
       const response = await axios.get(
-        `https://api.trello.com/1/checklists/${checklist.id}/checkItems?key=${apiKey}&token=${apiToken}`
+        `${api}/checklists/${checklist.id}/checkItems?key=${apiKey}&token=${apiToken}`
       );
       setCheckItems(response.data);
       updateProgress(response.data);
     } catch (error) {
-      console.error("Error fetching check items:", error);
       toast.error("Failed to load check items.");
     }
   };
@@ -40,14 +40,13 @@ const Checklist = ({ checklist, onDeleteChecklist }) => {
   const deleteCheckItem = async (checkItemId) => {
     try {
       await axios.delete(
-        `https://api.trello.com/1/checklists/${checklist.id}/checkItems/${checkItemId}?key=${apiKey}&token=${apiToken}`
+        `${api}/checklists/${checklist.id}/checkItems/${checkItemId}?key=${apiKey}&token=${apiToken}`
       );
       const updatedCheckItems = checkItems.filter(item => item.id !== checkItemId);
       setCheckItems(updatedCheckItems);
       updateProgress(updatedCheckItems);
       toast.success("Check item deleted successfully.");
     } catch (error) {
-      console.error("Error deleting check item:", error);
       toast.error("Failed to delete check item.");
     }
   };
@@ -61,7 +60,7 @@ const Checklist = ({ checklist, onDeleteChecklist }) => {
 
     try {
       const response = await axios.post(
-        `https://api.trello.com/1/checklists/${checklist.id}/checkItems?name=${newCheckItemName}&key=${apiKey}&token=${apiToken}`
+        `${api}/checklists/${checklist.id}/checkItems?name=${newCheckItemName}&key=${apiKey}&token=${apiToken}`
       );
       const updatedCheckItems = [...checkItems, response.data];
       setCheckItems(updatedCheckItems);
@@ -69,7 +68,6 @@ const Checklist = ({ checklist, onDeleteChecklist }) => {
       toast.success("Check item added successfully.");
       updateProgress(updatedCheckItems);
     } catch (error) {
-      console.error("Error adding check item:", error);
       toast.error("Failed to add check item.");
     }
   };
