@@ -1,0 +1,10 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+.create-list-container {
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 5px;
+}
