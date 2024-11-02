@@ -1,0 +1,13 @@
+/* App.css */
+body {
+    margin: 0; /* Remove default margin */
+    height: 100vh; /* Full viewport height */
+    background-image: url('src/assets/background.png'); /* Set your image path */
+    background-size: cover; /* Cover the entire area */
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Prevent repeating the image */
+}
+
+#root {
+    height: 100%; /* Make sure the root element takes full height */
+}
