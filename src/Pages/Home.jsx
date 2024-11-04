@@ -84,13 +84,13 @@ function Home() {
         {boards.map((board) => (
           <Grid item key={board.id} xs={12} sm={6} md={4} lg={3}>
             <Card sx={{ marginBottom: "8px", backgroundColor: "black" }}>
-              <CardContent>
-                <Link to={`/boards/${board.id}`}>
-                  <Typography variant="h6" component="div">
-                    {board.name}
-                  </Typography>
-                </Link>
-              </CardContent>
+            <CardContent>
+              <Link to={`/boards/${board.id}`} style={{ textDecoration: 'none' }}>
+                <Typography variant="h6" component="div" sx={{ color: 'white' }}>
+                  {board.name}
+                </Typography>
+              </Link>
+            </CardContent>
             </Card>
           </Grid>
         ))}
