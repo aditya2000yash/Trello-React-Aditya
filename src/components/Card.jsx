@@ -107,7 +107,7 @@ const MyCard = ({ card, onDeleteCard }) => {
                 checklist={checklist}
                 onDeleteChecklist={deleteChecklist}
               />
-            </div>// Import toast for notifications
+            </div>
           ))}
           <form onSubmit={(e) => { e.preventDefault(); createChecklist(); }}>
             <TextField
