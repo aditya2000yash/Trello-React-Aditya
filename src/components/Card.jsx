@@ -106,6 +106,7 @@ const MyCard = ({ card, onDeleteCard }) => {
                 key={checklist.id}
                 checklist={checklist}
                 onDeleteChecklist={deleteChecklist}
+                cardId={card.id}
               />
             </div>
           ))}
