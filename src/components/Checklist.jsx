@@ -8,7 +8,7 @@ const apiKey = import.meta.env.VITE_API_KEY;
 const apiToken = import.meta.env.VITE_API_TOKEN;
 const api = import.meta.env.VITE_API;
 
-const Checklist = ({ checklist, onDeleteChecklist }) => {
+const Checklist = ({ checklist, onDeleteChecklist, cardId }) => {
   const [checkItems, setCheckItems] = useState([]);
   const [newCheckItemName, setNewCheckItemName] = useState("");
   const [progress, setProgress] = useState(0);
@@ -33,7 +33,6 @@ const Checklist = ({ checklist, onDeleteChecklist }) => {
     const completedCount = items.filter(item => item.state === "complete").length;
     const totalCount = items.length;
     const completionPercentage = totalCount ? Math.floor((completedCount / totalCount) * 100) : 0;
-
     setProgress(completionPercentage);
   };
 
@@ -117,6 +116,8 @@ const Checklist = ({ checklist, onDeleteChecklist }) => {
           <CheckItem
             key={checkItem.id}
             checkItem={checkItem}
+            checklistId={checklist.id} // Ensure checklistId is passed
+            cardId={cardId} // Ensure cardId is passed
             onDeleteCheckItem={deleteCheckItem}
             updateProgress={updateProgress}
             checkItems={checkItems}
