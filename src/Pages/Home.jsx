@@ -146,3 +146,6 @@ function Home() {
 }
 
 export default Home;
+
+
+//will add in the redux file
